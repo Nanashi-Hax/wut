@@ -12,6 +12,8 @@
 
 #define SOCK_STREAM    1
 #define SOCK_DGRAM     2
+#define SOCK_RAW        3
+#define SOCK_SEQPACKET  5
 
 #define MSG_OOB        0x0001
 #define MSG_PEEK       0x0002
@@ -21,6 +23,26 @@
 #define SHUT_RD        0
 #define SHUT_WR        1
 #define SHUT_RDWR      2
+
+#ifndef IF_NAMESIZE
+#define IF_NAMESIZE 16
+#endif
+
+#ifndef MSG_EOR
+#define MSG_EOR 0
+#endif
+
+#ifndef SO_DEBUG
+#define SO_DEBUG 0
+#endif
+
+#ifndef SOMAXCONN
+#define SOMAXCONN 128
+#endif
+
+#ifndef SA_RESTART
+#define SA_RESTART 0
+#endif
 
 /*
  * SOL_SOCKET options
@@ -63,7 +85,7 @@ typedef uint16_t sa_family_t;
 struct sockaddr
 {
    sa_family_t sa_family;
-   char sa_data[];
+   char sa_data[14];
 };
 
 struct sockaddr_storage
@@ -76,6 +98,17 @@ struct linger
 {
    int l_onoff;
    int l_linger;
+};
+
+struct msghdr
+{
+    void*        msg_name;
+    unsigned int msg_namelen;
+    struct iovec* msg_iov;
+    unsigned int msg_iovlen;
+    void*        msg_control;
+    unsigned int msg_controllen;
+    int          msg_flags;
 };
 
 #ifdef __cplusplus
@@ -133,6 +166,11 @@ recvfrom(int sockfd,
          socklen_t *addrlen);
 
 ssize_t
+recvmsg(int socket,
+        struct msghdr *msg,
+        int flags);
+
+ssize_t
 send(int sockfd,
      const void *buf,
      size_t len,
@@ -145,6 +183,11 @@ sendto(int sockfd,
        int flags,
        const struct sockaddr *dest_addr,
        socklen_t addrlen);
+
+ssize_t
+sendmsg(int socket,
+        const struct msghdr *msg,
+        int flags);
 
 int
 setsockopt(int sockfd,
@@ -164,6 +207,9 @@ socket(int domain,
 
 int
 sockatmark(int sockfd);
+
+int
+socketpair(int domain, int type, int protocol, int socket_vector[2]);
 
 #ifdef __cplusplus
 }

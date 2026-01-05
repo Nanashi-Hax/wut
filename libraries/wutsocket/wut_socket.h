@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/iosupport.h>
 #include <sys/select.h>
+#include <sys/uio.h>
 #define __LINUX_ERRNO_EXTENSIONS__
 #include <errno.h>
 
